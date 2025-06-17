@@ -33,7 +33,7 @@
 
 ## 📸 系统截图
 
-[bilibili](https://www.bilibili.com/video/BV13ANazuEYq/)
+视频效果: [bilibili](https://www.bilibili.com/video/BV13ANazuEYq/)
 
 ![效果图](界面.png)
 
