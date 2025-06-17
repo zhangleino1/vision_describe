@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频识别服务</title>
+    
+    <!-- 添加 markdown 支持库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+    
+    <!-- 引入 markdown 样式 -->
+    <link rel="stylesheet" href="/static/css/markdown.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+            margin: 20px;
+            gap: 20px;
+        }
+
+        .video-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-stream {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2em;
+            z-index: 1;
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .result-item {
+            background: white;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .result-time {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .result-content {
+            line-height: 1.6;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .status {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .connected {
+            background: #28a745;
+            color: white;
+        }
+
+        .disconnected {
+            background: #dc3545;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+                gap: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .section-title {
+                font-size: 1.2em;
+            }
+
+            .video-section, .results-section {
+                padding: 15px;
+            }
+        }
+
+        /* 滚动条样式 */
+        .results-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎥 基于qwen2.5vl:7b智能视频识别系统</h1>
+    </div>
+
+    <div class="connection-status" id="connectionStatus">
+        <span id="statusText">连接中...</span>
+    </div>
+
+    <div class="container">
+        <div class="video-section">
+            <h2 class="section-title">📹 实时视频流</h2>
+            <div class="video-container">
+                <div class="loading pulse" id="videoLoading">正在加载视频流...</div>
+                <img src="/video_feed" alt="视频流" class="video-stream" id="videoStream" 
+                     onload="hideVideoLoading()" onerror="showVideoError()">
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2 class="section-title">🤖 识别结果</h2>
+            <div class="results-container" id="resultsContainer">
+                <div class="status" id="initialStatus">
+                    <p>🔄 等待识别结果...</p>
+                    <p style="font-size: 0.8em; margin-top: 10px;">系统正在分析视频内容，请稍候</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 markdown 工具 -->
+    <script src="/static/js/markdown-utils.js"></script>
+    
+    <script>
+        let ws;
+        let reconnectInterval;
+        const resultsContainer = document.getElementById('resultsContainer');
+        const statusElement = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('statusText');
+        const initialStatus = document.getElementById('initialStatus');
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function(event) {
+                console.log('WebSocket连接已建立');
+                updateConnectionStatus(true);
+                clearInterval(reconnectInterval);
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const result = JSON.parse(event.data);
+                    addResult(result);
+                } catch (e) {
+                    console.error('解析消息失败:', e);
+                }
+            };
+
+            ws.onclose = function(event) {
+                console.log('WebSocket连接已关闭');
+                updateConnectionStatus(false);
+                
+                // 尝试重连
+                reconnectInterval = setInterval(() => {
+                    console.log('尝试重新连接...');
+                    connectWebSocket();
+                }, 5000);
+            };
+
+            ws.onerror = function(error) {
+                console.error('WebSocket错误:', error);
+                updateConnectionStatus(false);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            statusElement.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+            statusText.textContent = connected ? '✅ 已连接' : '❌ 连接断开';
+        }
+
+        function addResult(result) {
+            // 隐藏初始状态提示
+            if (initialStatus) {
+                initialStatus.style.display = 'none';
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = 'result-item';
+            
+            // 使用 markdown 渲染器处理内容
+            const renderedContent = markdownRenderer.renderResultContent(result.content);
+            
+            resultElement.innerHTML = `
+                <div class="result-time">🕒 ${result.time}</div>
+                <div class="result-content">${renderedContent}</div>
+            `;
+
+            resultsContainer.insertBefore(resultElement, resultsContainer.firstChild);
+
+            // 初始化代码高亮
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightAll();
+            }
+
+            // 保持最多显示20个结果
+            const items = resultsContainer.querySelectorAll('.result-item');
+            if (items.length > 20) {
+                items[items.length - 1].remove();
+            }
+
+            // 自动滚动到顶部显示最新结果
+            resultsContainer.scrollTop = 0;
+        }
+
+        function hideVideoLoading() {
+            const loading = document.getElementById('videoLoading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+            console.log('视频流加载成功');
+        }
+
+        function showVideoError() {
+            const loading = document.getElementById('videoLoading');
+            if (loading) {
+                loading.innerHTML = '⚠️ 视频流加载失败，请检查网络连接';
+                loading.classList.remove('pulse');
+                loading.style.color = '#dc3545';
+            }
+            console.error('视频流加载失败');
+        }
+
+        // 检查视频流状态
+        function checkVideoStatus() {
+            const videoStream = document.getElementById('videoStream');
+            const loading = document.getElementById('videoLoading');
+            
+            if (videoStream && loading) {
+                // 设置超时检查
+                setTimeout(() => {
+                    if (loading.style.display !== 'none') {
+                        console.log('视频流加载超时，尝试重新加载');
+                        videoStream.src = videoStream.src + '?t=' + new Date().getTime();
+                    }
+                }, 10000); // 10秒超时
+                
+                // 检查图片是否真的加载成功
+                videoStream.onload = function() {
+                    // 检查图片尺寸，如果太小可能是错误页面
+                    if (this.naturalWidth > 100 && this.naturalHeight > 100) {
+                        hideVideoLoading();
+                    } else {
+                        console.log('视频流尺寸异常，可能未正确加载');
+                        setTimeout(() => {
+                            this.src = this.src + '?t=' + new Date().getTime();
+                        }, 2000);
+                    }
+                };
+                
+                videoStream.onerror = function() {
+                    showVideoError();
+                    // 尝试重新加载
+                    setTimeout(() => {
+                        console.log('尝试重新加载视频流');
+                        this.src = '/video_feed?t=' + new Date().getTime();
+                        loading.innerHTML = '🔄 重新加载视频流...';
+                        loading.style.display = 'block';
+                        loading.classList.add('pulse');
+                        loading.style.color = 'white';
+                    }, 5000);
+                };
+            }
+        }
+
+        // 页面加载完成后连接WebSocket和检查视频状态
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            checkVideoStatus();
+            
+            // 定期检查视频流状态
+            setInterval(() => {
+                const videoStream = document.getElementById('videoStream');
+                if (videoStream && !videoStream.complete) {
+                    console.log('视频流可能中断，尝试重新加载...');
+                    videoStream.src = '/video_feed?t=' + new Date().getTime();
+                }
+            }, 30000); // 每30秒检查一次
+        });
+
+        // 页面关闭时关闭WebSocket连接
+        window.addEventListener('beforeunload', function() {
+            if (ws) {
+                ws.close();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+websockets
+opencv-python
+ollama
+aiofiles

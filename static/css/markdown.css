@@ -1,0 +1,157 @@
+.markdown-content {
+    line-height: 1.6;
+    color: #333;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e1e4e8;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    margin-top: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.markdown-content h1 {
+    font-size: 1.6em;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+}
+
+.markdown-content h2 {
+    font-size: 1.4em;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+}
+
+.markdown-content h3 {
+    font-size: 1.2em;
+}
+
+.markdown-content p {
+    margin-bottom: 12px;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    margin-bottom: 12px;
+    padding-left: 1.5em;
+}
+
+.markdown-content li {
+    margin-bottom: 6px;
+}
+
+.markdown-content code {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.markdown-content pre {
+    padding: 12px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.markdown-content pre code {
+    display: inline;
+    max-width: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    background-color: transparent;
+    border: 0;
+}
+
+.markdown-content blockquote {
+    padding: 0 1em;
+    color: #6a737d;
+    border-left: 0.25em solid #dfe2e5;
+    margin-bottom: 12px;
+}
+
+.markdown-content table {
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    width: 100%;
+    font-size: 0.9em;
+}
+
+.markdown-content table th,
+.markdown-content table td {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+}
+
+.markdown-content table th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+}
+
+.markdown-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.markdown-toolbar button {
+    padding: 4px 8px;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    background: #f6f8fa;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background-color 0.2s;
+    color: #656d76;
+}
+
+.markdown-toolbar button:hover {
+    background-color: #f3f4f6;
+}
+
+.plain-text-result {
+    line-height: 1.6;
+    color: #2c3e50;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 全屏模式样式 */
+.fullscreen-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: white !important;
+    z-index: 9999 !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+.fullscreen-modal .markdown-content {
+    max-height: calc(100vh - 100px) !important;
+}
