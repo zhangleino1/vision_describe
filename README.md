@@ -27,7 +27,9 @@
 - **自动重连**：网络异常时自动重连RTSP流，保证服务稳定性
 
 ## 📸 系统截图
+
 [bilibili](https://www.bilibili.com/video/BV13ANazuEYq/)
+
 ![效果图](界面.png)
 
 ### 主界面
@@ -317,6 +319,12 @@ docker run -p 8000:8000 vision-describe
 - 调整视频分辨率设置
 - 增加帧队列大小
 - 检查网络带宽是否充足
+
+### 问题5：家用萤石摄像头如何开启rtsp
+
+[萤石](https://zhuanlan.zhihu.com/p/634346966)
+
+其他品牌的网上搜一下吧！
 
 ## 🤝 开发贡献
 
