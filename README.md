@@ -27,6 +27,8 @@
 - **自动重连**：网络异常时自动重连RTSP流，保证服务稳定性
 
 ## 📸 系统截图
+[bilibili](https://www.bilibili.com/video/BV13ANazuEYq/)
+![效果图](界面.png)
 
 ### 主界面
 - **左侧**：实时视频流展示区域，支持全屏查看
